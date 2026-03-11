@@ -11,16 +11,15 @@ public class StudentController {
     @GetMapping("/info")
     public  String getStudentInfo()
     {
-        return "学号" +
-                "姓名" +
-                "班级";
+        return "学号：42411143" +
+                "姓名：刘佳奇" +
+                "班级：周三上午12节";
     }
     @GetMapping("/courses")
     public List<String> getCourses()
     {
         List<String> list=new ArrayList<>();
-        list.add("语文");
-        list.add("数学");
+        list.add("Java EE开发实践");
         return list;
     }
     @PostMapping("/attendance")
