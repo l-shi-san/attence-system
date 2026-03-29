@@ -1,5 +1,10 @@
 package com.example.attendance.controller;
 
+import com.example.attendance.common.Result;
+import com.example.attendance.dto.AttendanceRequest;
+import com.example.attendance.entity.Student;
+import com.example.attendance.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -8,23 +13,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/student")
 public class StudentController {
-    @GetMapping("/info")
-    public  String getStudentInfo()
-    {
-        return "学号：42411143" +
-                "姓名：刘佳奇" +
-                "班级：周三上午12节";
+
+    @Autowired
+    private StudentService studentService;
+
+    @PostMapping("/create")
+    public Result<String> create(@RequestBody Student student){
+        return  Result.success(studentService.createStudent(student));
     }
-    @GetMapping("/courses")
-    public List<String> getCourses()
-    {
-        List<String> list=new ArrayList<>();
-        list.add("Java EE开发实践");
-        return list;
-    }
-    @PostMapping("/attendance")
-    public String takeAttendance(@RequestBody String studentId)
-    {
-        return "学号为" + studentId + "的学生打卡成功";
+
+    @GetMapping("/{id}")
+    public Result<Student> getById(@PathVariable String id){
+        return Result.success(studentService.getStudentById(id));
     }
 }
