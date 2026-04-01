@@ -1,0 +1,2 @@
+INSERT INTO public.course (course_id, course_name, class_name, teacher_id, classroom_name, rows, cols, exclude_seats, weekday, start_week, end_week, create_time) VALUES ('CS101', 'SpringBoot开发实践', '21级计科1班', 2, '通博楼B302', 8, 10, '1,1;1,2;8,10', 1, 1, 16, '2026-04-01 01:29:41.032978');
+INSERT INTO public.course (course_id, course_name, class_name, teacher_id, classroom_name, rows, cols, exclude_seats, weekday, start_week, end_week, create_time) VALUES ('CS102', '数据库系统基础', '21级信管1班', 2, '颐德楼H101', 5, 6, null, 3, 1, 16, '2026-04-01 01:29:41.032978');
