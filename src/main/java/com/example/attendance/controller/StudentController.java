@@ -18,12 +18,12 @@ public class StudentController {
     private StudentService studentService;
 
     @PostMapping("/create")
-    public Result<String> create(@RequestBody Student student){
+    public Result<Student> create(@RequestBody Student student){
         return  Result.success(studentService.createStudent(student));
     }
 
     @GetMapping("/{id}")
-    public Result<Student> getById(@PathVariable String id){
-        return Result.success(studentService.getStudentById(id));
+    public Result<Student> getById(@PathVariable Long id){
+        return Result.success(studentService.findStudentById(id));
     }
 }

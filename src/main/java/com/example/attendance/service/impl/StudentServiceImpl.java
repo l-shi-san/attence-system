@@ -1,39 +1,26 @@
 package com.example.attendance.service.impl;
 
-import com.example.attendance.dao.StudentDao;
 import com.example.attendance.entity.Student;
+import com.example.attendance.repository.StudentRepository;
 import com.example.attendance.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StudentServiceImpl implements StudentService {
+public class StudentServiceImpl implements StudentService{
     @Autowired
-    private StudentDao studentDao;
+    private StudentRepository studentRepository;
 
-    @Override
-    public String createStudent(Student student){
-        if(student.getStudentId() == null || student.getStudentId().isEmpty()){
-            throw new RuntimeException("学号不能为空");
-        }
-        if(student.getName() == null || student.getName().isEmpty()){
-            throw new RuntimeException("姓名不能为空");
-        }
-        if(student.getClassName() == null || student.getClassName().isEmpty()){
-            throw new RuntimeException("班级不能为空");
-        }
-        if(student.getAge() == null || student.getAge() < 0 || student.getAge() > 120){
-            throw new RuntimeException("年龄必须在0-120之间");
-        }
-        studentDao.insert(student);
-        return "创建成功";
+    public Student createStudent(Student student){
+        return studentRepository.save(student);
     }
 
-    @Override
-    public Student getStudentById(String studentId){
-        if(studentId == null || studentId.isEmpty()){
-            throw new RuntimeException("学号不能为空");
-        }
-        return  studentDao.findById(studentId);
+    public Student findStudentById(Long id){
+        return studentRepository.findById(id).orElse(null);
     }
+
+    public Student findStudentByName(String name){
+        return studentRepository.findByName(name);
+    }
+
 }
