@@ -4,7 +4,11 @@ import com.example.attendance.entity.Attendance;
 import com.example.attendance.entity.AttendanceStatus;
 import com.example.attendance.repository.AttendanceRepository;
 import com.example.attendance.service.AttendanceService;
+import com.example.attendance.specification.AttendanceSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Autowired
     private AttendanceRepository attendanceRepository;
+
+    // 原有的方法实现...
 
     @Override
     public Attendance createAttendance(Attendance attendance) {
@@ -86,7 +92,6 @@ public class AttendanceServiceImpl implements AttendanceService {
             statistics.put(status, count);
         }
 
-        // 初始化未出现的状态为0
         for (AttendanceStatus status : AttendanceStatus.values()) {
             statistics.putIfAbsent(status, 0L);
         }
@@ -102,5 +107,28 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public List<Attendance> findByTimeRange(LocalDateTime start, LocalDateTime end) {
         return attendanceRepository.findByCheckInTimeBetween(start, end);
+    }
+
+    // ========== 新增分页方法实现 ==========
+
+    @Override
+    public Page<Attendance> findAttendancesWithPagination(Pageable pageable) {
+        return attendanceRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Attendance> findAttendancesByCondition(String studentId,
+                                                       LocalDateTime startTime,
+                                                       LocalDateTime endTime,
+                                                       String status,
+                                                       String courseId,
+                                                       Pageable pageable) {
+        Specification<Attendance> spec = Specification
+                .where(AttendanceSpecification.hasStudentId(studentId))
+                .and(AttendanceSpecification.hasCourseId(courseId))
+                .and(AttendanceSpecification.hasStatus(status))
+                .and(AttendanceSpecification.hasCheckInTimeBetween(startTime, endTime));
+
+        return attendanceRepository.findAll(spec, pageable);
     }
 }
