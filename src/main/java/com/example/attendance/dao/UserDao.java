@@ -129,7 +129,7 @@ public class UserDao {
             user.setPassword(rs.getString("password"));
             user.setRealName(rs.getString("real_name"));
             user.setRole(rs.getString("role"));
-            user.setCreateTime(rs.getTimestamp("create_time"));
+            user.setCreateTime(rs.getTimestamp("create_time").toLocalDateTime());
             return user;
         }
     }

@@ -2,80 +2,49 @@ package com.example.attendance.service.impl;
 
 import com.example.attendance.dao.UserDao;
 import com.example.attendance.entity.User;
+import com.example.attendance.repository.UserRepository;
 import com.example.attendance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
 
-    @Override
-    public boolean addUser(User user) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // 用户注册
+    public boolean register(String username, String password, String realName, String role) {
         // 检查用户名是否已存在
-        if (userDao.existsByUsername(user.getUsername())) {
-            return false; // 用户名已存在
+        if (userRepository.existsByUsername(username)) {
+            return false;
         }
-        // 设置默认角色为 TEACHER
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("TEACHER");
-        }
-        int result = userDao.insert(user);
-        return result > 0;
+
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(password));  // BCrypt加密
+        user.setRealName(realName);
+        user.setRole(role != null ? role : "STUDENT");
+        user.setCreateTime(LocalDateTime.now());
+
+        userRepository.save(user);
+        return true;
     }
 
-    @Override
-    public User getUserById(Long id) {
-        return userDao.findById(id);
+    // 根据用户名查找用户
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
     }
 
-    @Override
-    public User getUserByUsername(String username) {
-        return userDao.findByUsername(username);
-    }
-
-    @Override
-    public List<User> getAllTeachers() {
-        return userDao.findAllTeachers();
-    }
-
-    @Override
-    public boolean updateUser(User user) {
-        // 检查用户是否存在
-        User existingUser = userDao.findById(user.getId());
-        if (existingUser == null) {
-            return false; // 用户不存在
-        }
-        int result = userDao.update(user);
-        return result > 0;
-    }
-
-    @Override
-    public boolean deleteUser(Long id) {
-        // 检查用户是否存在
-        User existingUser = userDao.findById(id);
-        if (existingUser == null) {
-            return false; // 用户不存在
-        }
-        int result = userDao.deleteById(id);
-        return result > 0;
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userDao.findAll();
-    }
-
-    @Override
-    public User login(String username, String password) {
-        User user = userDao.findByUsername(username);
-        if (user != null && user.getPassword().equals(password)) {
-            return user; // 登录成功
-        }
-        return null; // 登录失败
+    // 验证用户是否存在
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 }

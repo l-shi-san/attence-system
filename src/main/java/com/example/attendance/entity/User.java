@@ -1,85 +1,52 @@
 package com.example.attendance.entity;
 
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "user")
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(nullable = false)
     private String password;
+
+    @Column(name = "real_name", nullable = false)
     private String realName;
-    private String role;      // TEACHER, ADMIN, STUDENT
-    private Timestamp createTime;
 
-    // 无参构造器
-    public User() {}
+    @Column(nullable = false)
+    private String role;
 
-    // 全参构造器
-    public User(Long id, String username, String password, String realName, String role, Timestamp createTime) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.realName = realName;
-        this.role = role;
-        this.createTime = createTime;
+    @Column(name = "create_time")
+    private LocalDateTime createTime;  // ✅ 使用 LocalDateTime
+
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
     }
 
-    // Getter 和 Setter
-    public Long getId() {
-        return id;
-    }
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public String getUsername() {
-        return username;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    public String getRealName() { return realName; }
+    public void setRealName(String realName) { this.realName = realName; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRealName() {
-        return realName;
-    }
-
-    public void setRealName(String realName) {
-        this.realName = realName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public Timestamp getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Timestamp createTime) {
-        this.createTime = createTime;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", realName='" + realName + '\'' +
-                ", role='" + role + '\'' +
-                ", createTime=" + createTime +
-                '}';
-    }
+    public LocalDateTime getCreateTime() { return createTime; }
+    public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }
