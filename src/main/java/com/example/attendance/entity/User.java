@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -17,7 +17,7 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "real_name", nullable = false)
+    @Column(name = "real_name", nullable = true)
     private String realName;
 
     @Column(nullable = false)

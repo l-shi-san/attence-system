@@ -1,6 +1,6 @@
 package com.example.attendance.config;
 
-import com.example.attendance.service.CustomUserDetailsService;
+import com.example.attendance.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,25 +27,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // 开发阶段可先关闭CSRF
+                .userDetailsService(userDetailsService)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 公开接口（无需认证）
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()
+                        // 公开的API
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
-                        // 角色权限控制
+                        // 角色权限控制的API
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/teacher/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers("/api/student/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-                        // 其他请求需要认证
-                        .anyRequest().permitAll()
+                        // 其他所有请求都需要认证
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginProcessingUrl("/api/auth/login")
-                        .defaultSuccessUrl("/api/dashboard")
+                        .loginPage("/login")  // 自定义登录页面
+                        .loginProcessingUrl("/login")  // 登录处理URL
+                        .defaultSuccessUrl("/dashboard", true)  // 登录成功跳转
+                        .failureUrl("/login?error=true")  // 登录失败跳转
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/api/auth/logout")
-                        .logoutSuccessUrl("/api/auth/login?logout")
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 );
 

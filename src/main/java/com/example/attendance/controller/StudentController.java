@@ -5,6 +5,7 @@ import com.example.attendance.dto.AttendanceRequest;
 import com.example.attendance.entity.Student;
 import com.example.attendance.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,5 +26,12 @@ public class StudentController {
     @GetMapping("/{id}")
     public Result<Student> getById(@PathVariable Long id){
         return Result.success(studentService.findStudentById(id));
+    }
+
+    @GetMapping("/students")
+    public String studentList(Model model) {
+        List<Student> students = studentService.findAll();
+        model.addAttribute("students", students);
+        return "students";
     }
 }

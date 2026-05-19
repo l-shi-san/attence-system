@@ -1,4 +1,4 @@
-package com.example.attendance.service;
+package com.example.attendance.service.impl;
 
 import com.example.attendance.entity.User;
 import com.example.attendance.repository.UserRepository;
@@ -20,6 +20,8 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("用户不存在: " + username));
+
+        String role = "ROLE_" + user.getRole();
 
         // 构建Spring Security的UserDetails对象
         return org.springframework.security.core.userdetails.User

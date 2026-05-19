@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">首页</title>
+    <style>
+        .container { width: 500px; margin: 100px auto; text-align: center; }
+        h1 { color: #333; }
+        .nav { margin-top: 30px; }
+        a { display: inline-block; margin: 0 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="${title}">班级考勤管理系统</h1>
+    <p>欢迎使用本系统！</p>
+    <div class="nav">
+        <a href="/student/list">学生管理</a>
+        <a href="/attendance/list">考勤管理</a>
+    </div>
+</div>
+</body>
+</html>

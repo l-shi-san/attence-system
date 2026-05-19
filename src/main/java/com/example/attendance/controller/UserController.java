@@ -44,9 +44,7 @@ public class UserController {
         // 执行注册
         boolean success = userService.register(
                 request.getUsername(),
-                request.getPassword(),
-                request.getRealName(),
-                request.getRole()
+                request.getPassword()
         );
 
         Map<String, Object> response = new HashMap<>();
