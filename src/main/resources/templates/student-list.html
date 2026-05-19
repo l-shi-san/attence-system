@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>学生管理 - 班级考勤管理系统</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+  <style>
+    .container { max-width: 1200px; margin-top: 20px; margin-bottom: 20px; }
+    .search-form { margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; }
+    .pagination { margin-top: 20px; justify-content: center; }
+    .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
+    .sort-link { text-decoration: none; color: white; cursor: pointer; }
+    .sort-link:hover { text-decoration: underline; opacity: 0.8; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; }
+    .badge-status { font-size: 12px; padding: 5px 10px; }
+    .search-type-active { background-color: #007bff; color: white; }
+    .table th { white-space: nowrap; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">📚 学生信息管理</h3>
+      <a href="/student/add" class="btn btn-light btn-sm">➕ 新增学生</a>
+    </div>
+    <div class="card-body">
+
+      <!-- 搜索表单 -->
+      <form method="get" action="/student/list" class="search-form">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label fw-bold">搜索方式</label>
+            <select name="searchType" class="form-select">
+              <option value="name" th:selected="${searchType == 'name'}">按姓名搜索</option>
+              <option value="studentNo" th:selected="${searchType == 'studentNo'}">按学号搜索</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">关键词</label>
+            <div class="input-group">
+              <span class="input-group-text">🔍</span>
+              <input type="text" name="keyword" class="form-control"
+                     placeholder="请输入搜索内容..." th:value="${keyword}"/>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">搜索</button>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-12">
+            <a href="/student/list" class="btn btn-secondary btn-sm">清空搜索</a>
+          </div>
+        </div>
+        <!-- 保留排序和分页参数 -->
+        <input type="hidden" name="sortField" th:value="${sortField}"/>
+        <input type="hidden" name="sortDir" th:value="${sortDir}"/>
+        <input type="hidden" name="size" th:value="${size}"/>
+        <input type="hidden" name="page" th:value="1"/>
+      </form>
+
+      <!-- 统计信息 -->
+      <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <span>📊 共找到 <strong th:text="${totalElements}">0</strong> 条记录</span>
+        <div>
+          <label class="me-2">每页显示：</label>
+          <select class="form-select form-select-sm d-inline-block w-auto"
+                  onchange="window.location.href=this.value">
+            <option th:selected="${size == 5}"
+                    th:value="'/student/list?size=5&keyword=' + (${keyword} != null ? ${keyword} : '') + '&searchType=' + (${searchType} != null ? ${searchType} : '') + '&sortField=' + ${sortField} + '&sortDir=' + ${sortDir}">
+              5条
+            </option>
+            <option th:selected="${size == 10}"
+                    th:value="'/student/list?size=10&keyword=' + (${keyword} != null ? ${keyword} : '') + '&searchType=' + (${searchType} != null ? ${searchType} : '') + '&sortField=' + ${sortField} + '&sortDir=' + ${sortDir}">
+              10条
+            </option>
+            <option th:selected="${size == 20}"
+                    th:value="'/student/list?size=20&keyword=' + (${keyword} != null ? ${keyword} : '') + '&searchType=' + (${searchType} != null ? ${searchType} : '') + '&sortField=' + ${sortField} + '&sortDir=' + ${sortDir}">
+              20条
+            </option>
+            <option th:selected="${size == 50}"
+                    th:value="'/student/list?size=50&keyword=' + (${keyword} != null ? ${keyword} : '') + '&searchType=' + (${searchType} != null ? ${searchType} : '') + '&sortField=' + ${sortField} + '&sortDir=' + ${sortDir}">
+              50条
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 学生表格 -->
+      <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+          <thead class="table-dark">
+          <tr>
+            <th style="width: 60px;">
+              <a th:href="@{/student/list(keyword=${keyword}, searchType=${searchType}, page=1, size=${size}, sortField='id', sortDir=${reverseSortDir})}"
+                 class="sort-link">
+                ID
+                <span th:if="${sortField == 'id'}">
+                                            <span th:if="${sortDir == 'asc'}">⬆️</span>
+                                            <span th:if="${sortDir == 'desc'}">⬇️</span>
+                                        </span>
+              </a>
+            </th>
+            <th style="width: 120px;">
+              <a th:href="@{/student/list(keyword=${keyword}, searchType=${searchType}, page=1, size=${size}, sortField='studentNo', sortDir=${reverseSortDir})}"
+                 class="sort-link">
+                学号
+                <span th:if="${sortField == 'studentNo'}">
+                                            <span th:if="${sortDir == 'asc'}">⬆️</span>
+                                            <span th:if="${sortDir == 'desc'}">⬇️</span>
+                                        </span>
+              </a>
+            </th>
+            <th style="width: 100px;">
+              <a th:href="@{/student/list(keyword=${keyword}, searchType=${searchType}, page=1, size=${size}, sortField='name', sortDir=${reverseSortDir})}"
+                 class="sort-link">
+                姓名
+                <span th:if="${sortField == 'name'}">
+                                            <span th:if="${sortDir == 'asc'}">⬆️</span>
+                                            <span th:if="${sortDir == 'desc'}">⬇️</span>
+                                        </span>
+              </a>
+            </th>
+            <th style="width: 80px;">性别</th>
+            <th>
+              <a th:href="@{/student/list(keyword=${keyword}, searchType=${searchType}, page=1, size=${size}, sortField='className', sortDir=${reverseSortDir})}"
+                 class="sort-link">
+                班级
+                <span th:if="${sortField == 'className'}">
+                                            <span th:if="${sortDir == 'asc'}">⬆️</span>
+                                            <span th:if="${sortDir == 'desc'}">⬇️</span>
+                                        </span>
+              </a>
+            </th>
+            <th style="width: 130px;">联系方式</th>
+            <th style="width: 80px;">状态</th>
+            <th style="width: 160px;">
+              <a th:href="@{/student/list(keyword=${keyword}, searchType=${searchType}, page=1, size=${size}, sortField='createTime', sortDir=${reverseSortDir})}"
+                 class="sort-link">
+                创建时间
+                <span th:if="${sortField == 'createTime'}">
+                                            <span th:if="${sortDir == 'asc'}">⬆️</span>
+                                            <span th:if="${sortDir == 'desc'}">⬇️</span>
+                                        </span>
+              </a>
+            </th>
+            <th style="width: 180px;">操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="student : ${students}">
+            <td th:text="${student.id}" class="text-center">1</td>
+            <td th:text="${student.studentNo}" class="text-center">2023001</td>
+            <td th:text="${student.name}">张三</td>
+            <td class="text-center">
+              <span th:if="${student.gender == '男'}" class="badge bg-info">男</span>
+              <span th:if="${student.gender == '女'}" class="badge bg-warning">女</span>
+              <span th:if="${student.gender == null}">-</span>
+            </td>
+            <td th:text="${student.className}">软件工程1班</td>
+            <td th:text="${student.phone}">138****0000</td>
+            <td class="text-center">
+              <span th:if="${student.status == 1}" class="badge bg-success">在读</span>
+              <span th:if="${student.status == 0}" class="badge bg-secondary">休学</span>
+            </td>
+            <td th:text="${#temporals.format(student.createTime, 'yyyy-MM-dd HH:mm')}" th:if="${student.createTime != null}">-</td>
+            <td class="action-buttons">
+              <a th:href="@{/attendance/student/{id}(id=${student.id})}"
+                 class="btn btn-sm btn-success" title="考勤记录">
+                📝 考勤
+              </a>
+              <a th:href="@{/student/edit/{id}(id=${student.id})}"
+                 class="btn btn-sm btn-info" title="编辑">
+                ✏️ 编辑
+              </a>
+              <a th:href="@{/student/delete/{id}(id=${student.id})}"
+                 class="btn btn-sm btn-danger" title="删除"
+                 onclick="return confirm('⚠️ 确定要删除学生【' + '${student.name}' + '】吗？\n删除后将无法恢复！')">
+                🗑️ 删除
+              </a>
+            </td>
+          </tr>
+          <tr th:if="${students.isEmpty()}">
+            <td colspan="9" class="text-center text-muted py-4">
+              📭 暂无学生数据，请点击"新增学生"添加
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 分页导航 -->
+      <nav th:if="${totalPages > 0}">
+        <ul class="pagination justify-content-center">
+          <!-- 首页 -->
+          <li th:class="${currentPage == 1} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link"
+               th:href="@{/student/list(page=1, size=${size}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">
+              首页
+            </a>
+          </li>
+
+          <!-- 上一页 -->
+          <li th:class="${currentPage == 1} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link"
+               th:href="@{/student/list(page=${prevPage}, size=${size}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">
+              上一页
+            </a>
+          </li>
+
+          <!-- 页码 -->
+          <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
+            <li th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
+                th:class="${i == currentPage} ? 'page-item active' : 'page-item'">
+              <a class="page-link"
+                 th:href="@{/student/list(page=${i}, size=${size}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}"
+                 th:text="${i}">1</a>
+            </li>
+          </th:block>
+
+          <!-- 下一页 -->
+          <li th:class="${currentPage == totalPages} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link"
+               th:href="@{/student/list(page=${nextPage}, size=${size}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">
+              下一页
+            </a>
+          </li>
+
+          <!-- 末页 -->
+          <li th:class="${currentPage == totalPages} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link"
+               th:href="@{/student/list(page=${totalPages}, size=${size}, keyword=${keyword}, searchType=${searchType}, sortField=${sortField}, sortDir=${sortDir})}">
+              末页
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 页面信息 -->
+      <div class="text-center text-muted mt-3" th:if="${totalPages > 0}">
+        第 <strong th:text="${currentPage}">1</strong> 页 / 共 <strong th:text="${totalPages}">1</strong> 页
+        （总计 <strong th:text="${totalElements}">0</strong> 条记录）
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

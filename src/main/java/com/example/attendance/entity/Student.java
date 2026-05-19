@@ -2,48 +2,120 @@ package com.example.attendance.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "student")
 public class Student {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "student_id", nullable = false, unique = true, length = 20)
-    private String studentId;
+    @Column(name = "student_no", nullable = false, unique = true, length = 20)
+    private String studentNo;  // 学号
 
     @Column(name = "name", nullable = false, length = 50)
-    private String name;
+    private String name;  // 姓名
 
-    @Column(name = "class_name", nullable = false, length = 50)
-    private String className;
+    @Column(name = "gender", length = 10)
+    private String gender;  // 性别：男/女
 
-    @Column(name = "age")
-    private Integer age;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;  // 出生日期
 
-    public Student() {}
+    @Column(name = "phone", length = 20)
+    private String phone;  // 联系方式
 
-    public Student(String studentId, String name, String className, Integer age) {
-        this.studentId = studentId;
-        this.name = name;
-        this.className = className;
-        this.age = age;
+    @Column(name = "class_name", length = 50)
+    private String className;  // 班级
+
+    @Column(name = "status")
+    private Integer status;  // 状态：1-在读，0-休学
+
+    @Column(name = "create_time")
+    private LocalDateTime createTime;
+
+    @Column(name = "update_time")
+    private LocalDateTime updateTime;
+
+    public Integer getId() {
+        return id;
     }
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getStudentId() { return studentId; }
-    public void setStudentId(String studentId) { this.studentId = studentId; }
+    public String getStudentNo() {
+        return studentNo;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setStudentNo(String studentNo) {
+        this.studentNo = studentNo;
+    }
 
-    public String getClassName() { return className; }
-    public void setClassName(String className) { this.className = className; }
+    public String getName() {
+        return name;
+    }
 
-    public Integer getAge() { return age; }
-    public void setAge(Integer age) { this.age = age; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
+    }
 }
