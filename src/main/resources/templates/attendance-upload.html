@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Excel 考勤导入</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4 mb-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">📤 Excel 考勤数据导入</h3>
+            <a href="/dashboard" class="btn btn-outline-light btn-sm">返回首页</a>
+        </div>
+        <div class="card-body">
+
+            <!-- 导入说明 -->
+            <div class="alert alert-info">
+                <strong>📋 导入说明：</strong>
+                <ul class="mb-0 mt-1">
+                    <li>支持 <code>.xlsx</code> / <code>.xls</code> 格式</li>
+                    <li>单个文件最大 <strong>10 MB</strong></li>
+                    <li>第一行为标题行（自动跳过）</li>
+                    <li>Excel 列顺序：<strong>A-学号, B-姓名, C-课程名称, D-打卡日期(yyyy-MM-dd), E-打卡时间(HH:mm:ss), F-状态(NORMAL/LATE/EARLY/ABSENT), G-备注(可选)</strong></li>
+                </ul>
+            </div>
+
+            <!-- 错误提示 -->
+            <div th:if="${errorMsg}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>❌ 上传失败！</strong> <span th:text="${errorMsg}">错误信息</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- 上传表单 -->
+            <form method="post" action="/attendance/upload" enctype="multipart/form-data" class="mb-4">
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label">选择 Excel 文件</label>
+                    <input type="file" name="file" id="fileInput"
+                           class="form-control" accept=".xlsx,.xls" required/>
+                    <div class="form-text">仅支持 .xlsx 和 .xls 格式，最大 10MB</div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    ⬆️ 上传并导入
+                </button>
+            </form>
+
+            <!-- 导入结果展示 -->
+            <div th:if="${importResult}" class="mt-4">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">✅ 导入完成</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1">文件：<code th:text="${fileName}">data.xlsx</code></p>
+
+                        <div class="row text-center mt-3">
+                            <div class="col-4">
+                                <div class="border rounded p-3 bg-light">
+                                    <h4 class="text-primary" th:text="${importResult.total}">0</h4>
+                                    <small class="text-muted">总处理条数</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-3 bg-light">
+                                    <h4 class="text-success" th:text="${importResult.successCount}">0</h4>
+                                    <small class="text-muted">✅ 成功导入</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border rounded p-3 bg-light">
+                                    <h4 class="text-danger" th:text="${importResult.failCount}">0</h4>
+                                    <small class="text-muted">❌ 导入失败</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 错误详情 -->
+                        <div th:if="${!importResult.errors.isEmpty()}" class="mt-3">
+                            <h6>错误详情：</h6>
+                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered table-danger">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>错误信息</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="err, stat : ${importResult.errors}">
+                                        <td th:text="${stat.count}">1</td>
+                                        <td th:text="${err}">错误内容</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div th:if="${importResult.errors.isEmpty()}" class="alert alert-success mt-3 mb-0">
+                            🎉 所有数据全部导入成功，无错误！
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

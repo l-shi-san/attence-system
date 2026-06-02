@@ -1,5 +1,6 @@
 package com.example.attendance.service.impl;
 
+import com.example.attendance.dto.AttendanceStatisticsDTO;
 import com.example.attendance.entity.Attendance;
 import com.example.attendance.entity.Course;
 import com.example.attendance.entity.Student;
@@ -12,9 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -133,5 +139,86 @@ public class AttendanceServiceImpl implements AttendanceService {
     public Page<Attendance> search(String keyword, Pageable pageable) {
         return attendanceRepository.findByStudentNoContainingOrStudentNameContainingOrCourseNameContaining(
                 keyword, keyword, keyword, pageable);
+    }
+
+    // ========================================================================
+    // 考勤统计方法实现
+    // ========================================================================
+
+    @Override
+    public AttendanceStatisticsDTO getStatisticsByStudentAndDateRange(
+            Integer studentId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+
+        long total = attendanceRepository.countByStudentIdAndCheckInTimeBetween(studentId, start, end);
+        long normal = attendanceRepository.countByStudentIdAndStatusAndCheckInTimeBetween(
+                studentId, "NORMAL", start, end);
+        long late = attendanceRepository.countByStudentIdAndStatusAndCheckInTimeBetween(
+                studentId, "LATE", start, end);
+        long early = attendanceRepository.countByStudentIdAndStatusAndCheckInTimeBetween(
+                studentId, "EARLY", start, end);
+        long absent = attendanceRepository.countByStudentIdAndStatusAndCheckInTimeBetween(
+                studentId, "ABSENT", start, end);
+
+        return new AttendanceStatisticsDTO(total, normal, late, absent, early);
+    }
+
+    @Override
+    public AttendanceStatisticsDTO getStatisticsByDateRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+
+        long total = attendanceRepository.countByCheckInTimeBetween(start, end);
+        long normal = attendanceRepository.countByStatusAndCheckInTimeBetween("NORMAL", start, end);
+        long late = attendanceRepository.countByStatusAndCheckInTimeBetween("LATE", start, end);
+        long early = attendanceRepository.countByStatusAndCheckInTimeBetween("EARLY", start, end);
+        long absent = attendanceRepository.countByStatusAndCheckInTimeBetween("ABSENT", start, end);
+
+        return new AttendanceStatisticsDTO(total, normal, late, absent, early);
+    }
+
+    @Override
+    public List<AttendanceStatisticsDTO> getWeeklyStatistics(int weeks) {
+        List<AttendanceStatisticsDTO> result = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = weeks - 1; i >= 0; i--) {
+            // 计算第 i 周的开始（周一）和结束（周日）
+            LocalDate weekStart = today.minusWeeks(i)
+                    .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            LocalDate weekEnd = weekStart.plusDays(6);
+
+            AttendanceStatisticsDTO dto = getStatisticsByDateRange(weekStart, weekEnd);
+
+            // 设置分组信息
+            int weekOfYear = weekStart.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+            dto.setGroupKey(weekStart.getYear() + "-W" + String.format("%02d", weekOfYear));
+            dto.setGroupLabel("第" + weekOfYear + "周（" + weekStart + " ~ " + weekEnd + "）");
+
+            result.add(dto);
+        }
+        return result;
+    }
+
+    @Override
+    public List<AttendanceStatisticsDTO> getMonthlyStatistics(int months) {
+        List<AttendanceStatisticsDTO> result = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        for (int i = months - 1; i >= 0; i--) {
+            YearMonth ym = YearMonth.from(today).minusMonths(i);
+            LocalDate monthStart = ym.atDay(1);
+            LocalDate monthEnd = ym.atEndOfMonth();
+
+            AttendanceStatisticsDTO dto = getStatisticsByDateRange(monthStart, monthEnd);
+
+            // 设置分组信息
+            dto.setGroupKey(ym.toString());  // "2026-06"
+            dto.setGroupLabel(ym.getYear() + "年" + ym.getMonthValue() + "月");
+
+            result.add(dto);
+        }
+        return result;
     }
 }

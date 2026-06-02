@@ -31,4 +31,22 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Integer>
 
     Page<Attendance> findByStudentNoContainingOrStudentNameContainingOrCourseNameContaining(
             String studentNo, String studentName, String courseName, Pageable pageable);
+
+    // ===== 考勤统计查询 =====
+
+    /** 统计某学生在指定日期范围内的总记录数 */
+    long countByStudentIdAndCheckInTimeBetween(Integer studentId, LocalDateTime start, LocalDateTime end);
+
+    /** 统计某学生在指定日期范围内按状态的记录数 */
+    long countByStudentIdAndStatusAndCheckInTimeBetween(
+            Integer studentId, String status, LocalDateTime start, LocalDateTime end);
+
+    /** 统计指定日期范围内所有考勤记录 */
+    long countByCheckInTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    /** 统计指定日期范围内按状态的记录数 */
+    long countByStatusAndCheckInTimeBetween(String status, LocalDateTime start, LocalDateTime end);
+
+    /** 查询指定日期范围内的所有记录（按时间升序） */
+    List<Attendance> findByCheckInTimeBetweenOrderByCheckInTimeAsc(LocalDateTime start, LocalDateTime end);
 }

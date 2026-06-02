@@ -78,6 +78,8 @@
             <a href="/student/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">👨‍🎓 学生管理</a>
             <a href="/course/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📚 课程管理</a>
             <a href="/attendance/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📊 考勤管理</a>
+            <a href="/attendance/upload" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📤 导入考勤</a>
+            <a href="/attendance/statistics?mode=range" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📈 考勤统计</a>
             <a href="/attendance/checkin" sec:authorize="hasRole('STUDENT')">✅ 考勤打卡</a>
             <a href="/attendance/my-list" sec:authorize="hasRole('STUDENT')">📝 我的考勤</a>
         </div>
