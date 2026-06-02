@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>学生考勤记录</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4 mb-4">
+  <div class="card shadow">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">
+        📝 <span th:text="${student.name}">学生</span> 的考勤记录
+        （<span th:text="${student.studentNo}">学号</span>）
+      </h3>
+      <a href="/student/list" class="btn btn-outline-light btn-sm">返回学生列表</a>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-4">
+          <div class="alert alert-info text-center mb-0">
+            总打卡：<strong th:text="${totalElements}">0</strong> 次
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="alert alert-success text-center mb-0">
+            正常：<strong th:text="${normalCount}">0</strong> 次
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="alert alert-warning text-center mb-0">
+            迟到：<strong th:text="${lateCount}">0</strong> 次
+          </div>
+        </div>
+      </div>
+
+      <table class="table table-striped">
+        <thead class="table-dark">
+        <tr>
+          <th>课程</th>
+          <th>打卡时间</th>
+          <th>状态</th>
+          <th>备注</th>
+          <th>IP</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="att : ${attendances}">
+          <td th:text="${att.courseName}">课程</td>
+          <td th:text="${#temporals.format(att.checkInTime, 'yyyy-MM-dd HH:mm:ss')}">时间</td>
+          <td>
+            <span th:if="${att.status == 'NORMAL'}" class="text-success">正常</span>
+            <span th:if="${att.status == 'LATE'}" class="text-warning">迟到</span>
+          </td>
+          <td th:text="${att.remark ?: '-'}">-</td>
+          <td th:text="${att.ip}">IP</td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(attendances)}">
+          <td colspan="5" class="text-center text-muted">暂无考勤记录</td>
+        </tr>
+        </tbody>
+      </table>
+
+      <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+          <li th:class="${currentPage == 1} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link" th:href="@{/attendance/student/{id}(id=${student.id}, page=${prevPage})}">上一页</a>
+          </li>
+          <li class="page-item active">
+            <span class="page-link" th:text="${currentPage} + ' / ' + ${totalPages}">1 / 1</span>
+          </li>
+          <li th:class="${currentPage == totalPages} ? 'page-item disabled' : 'page-item'">
+            <a class="page-link" th:href="@{/attendance/student/{id}(id=${student.id}, page=${nextPage})}">下一页</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+</body>
+</html>

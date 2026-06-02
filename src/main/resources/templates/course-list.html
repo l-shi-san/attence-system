@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>课程管理</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="container mt-4 mb-4">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">📚 课程管理</h3>
+      <div>
+        <a href="/course/add" class="btn btn-light btn-sm">➕ 新增课程</a>
+        <a href="/dashboard" class="btn btn-outline-light btn-sm">返回首页</a>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+        <tr>
+          <th>编号</th>
+          <th>课程名称</th>
+          <th>课程代码</th>
+          <th>授课教师</th>
+          <th>上课时间</th>
+          <th>教室</th>
+          <th>状态</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="course : ${courses}">
+          <td th:text="${course.id}">1</td>
+          <td th:text="${course.courseName}">Java EE</td>
+          <td th:text="${course.courseCode}">CS101</td>
+          <td th:text="${course.teacherName}">张老师</td>
+          <td>
+            <span th:text="${course.startTime} + ' - ' + ${course.endTime}">08:00 - 09:40</span>
+            <small class="text-muted" th:if="${course.weekDay != null}">
+              （周<span th:text="${course.weekDay}">1</span>）
+            </small>
+          </td>
+          <td th:text="${course.classroom}">A101</td>
+          <td>
+            <span th:if="${course.status == 1}" class="badge bg-success">启用</span>
+            <span th:if="${course.status == 0}" class="badge bg-secondary">停用</span>
+          </td>
+          <td>
+            <a th:href="@{/course/edit/{id}(id=${course.id})}" class="btn btn-sm btn-info">编辑</a>
+            <a th:href="@{/course/delete/{id}(id=${course.id})}" class="btn btn-sm btn-danger"
+               onclick="return confirm('确定删除该课程吗？')">删除</a>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(courses)}">
+          <td colspan="8" class="text-center text-muted py-4">暂无课程，请先添加</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
