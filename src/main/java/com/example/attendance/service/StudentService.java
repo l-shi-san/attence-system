@@ -9,24 +9,30 @@ import java.util.List;
 public interface StudentService {
     Student createStudent(Student student);
 
-    Student findStudentById(Long studentId);
+    Student findStudentById(Integer studentId);
 
     Student findStudentByName(String name);
 
     List<Student> findAll();
 
-    // 基础 CRUD
     Student save(Student student);
-    Student findById(Long id);
-    void deleteById(Long id);
-    boolean existsByStudentNo(String studentNo);
 
-    // 分页查询
+    Student findById(Integer id);
+
+    void deleteById(Integer id);
+
+    /**
+     * 管理员新增学生时，同步创建登录账号
+     */
+    Student saveWithUser(Student student, String initialPassword);
+
     Page<Student> findAll(Pageable pageable);
 
-    // 按学号精确搜索
     Page<Student> searchByStudentNo(String studentNo, Pageable pageable);
 
-    // 按姓名模糊搜索
     Page<Student> searchByName(String name, Pageable pageable);
+
+    Student findByStudentNo(String studentNo);
+
+    boolean existsByStudentNo(String studentNo);
 }

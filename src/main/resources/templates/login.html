@@ -19,6 +19,9 @@
 <div class="container">
     <h2>用户登录</h2>
 
+    <!-- 显示注册成功信息 -->
+    <div th:if="${successMsg}" class="success" th:text="${successMsg}"></div>
+
     <!-- 显示错误信息（Spring Security 自动添加的 error 参数） -->
     <div th:if="${param.error}" class="error">
         用户名或密码错误，请重试

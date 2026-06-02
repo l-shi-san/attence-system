@@ -9,70 +9,85 @@ public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(name = "student_id", nullable = false, length = 20)
-    private String studentId;
+    @Column(name = "student_id")
+    private Integer studentId;  // 学生ID
 
-    @Column(name = "student_name", nullable = false, length = 50)
-    private String studentName;
+    @Column(name = "student_no", length = 20)
+    private String studentNo;  // 学号
 
-    @Column(name = "course_id", nullable = false, length = 50)
-    private String courseId;
+    @Column(name = "student_name", length = 50)
+    private String studentName;  // 学生姓名
+
+    @Column(name = "course_id")
+    private Integer courseId;  // 课程ID
+
+    @Column(name = "course_name", length = 100)
+    private String courseName;  // 课程名称（冗余字段）
 
     @Column(name = "check_in_time")
-    private LocalDateTime checkInTime;
+    private LocalDateTime checkInTime;  // 打卡时间
 
     @Column(name = "seat_row")
-    private Integer seatRow;
+    private Integer seatRow;  // 座位行
 
     @Column(name = "seat_col")
-    private Integer seatCol;
+    private Integer seatCol;  // 座位列
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private AttendanceStatus status;
+    @Column(length = 20)
+    private String status;  // NORMAL正常/LATE迟到/EARLY早退/ABSENT缺勤
 
-    @Column(name = "ip", length = 50)
-    private String ip;
+    @Column(length = 15)
+    private String ip;  // IP地址
+
+    @Column(length = 255)
+    private String remark;  // 备注
 
     @Column(name = "create_time")
     private LocalDateTime createTime;
 
-    // 无参构造器
-    public Attendance() {}
-
-    // 全参构造器
-    public Attendance(Long id, String studentId, String studentName, String courseId,
-                      LocalDateTime checkInTime, Integer seatRow, Integer seatCol,
-                      AttendanceStatus status, String ip, LocalDateTime createTime) {
+    public Attendance(Integer id, Integer studentId, String studentNo, String studentName, Integer courseId, String courseName, LocalDateTime checkInTime, Integer seatRow, Integer seatCol, String status, String ip, String remark, LocalDateTime createTime) {
         this.id = id;
         this.studentId = studentId;
+        this.studentNo = studentNo;
         this.studentName = studentName;
         this.courseId = courseId;
+        this.courseName = courseName;
         this.checkInTime = checkInTime;
         this.seatRow = seatRow;
         this.seatCol = seatCol;
         this.status = status;
         this.ip = ip;
+        this.remark = remark;
         this.createTime = createTime;
     }
 
-    // Getters and Setters
-    public Long getId() {
+    public Attendance() {
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getStudentId() {
+    public Integer getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(String studentId) {
+    public void setStudentId(Integer studentId) {
         this.studentId = studentId;
+    }
+
+    public String getStudentNo() {
+        return studentNo;
+    }
+
+    public void setStudentNo(String studentNo) {
+        this.studentNo = studentNo;
     }
 
     public String getStudentName() {
@@ -83,12 +98,20 @@ public class Attendance {
         this.studentName = studentName;
     }
 
-    public String getCourseId() {
+    public Integer getCourseId() {
         return courseId;
     }
 
-    public void setCourseId(String courseId) {
+    public void setCourseId(Integer courseId) {
         this.courseId = courseId;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
     }
 
     public LocalDateTime getCheckInTime() {
@@ -115,11 +138,11 @@ public class Attendance {
         this.seatCol = seatCol;
     }
 
-    public AttendanceStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(AttendanceStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -129,6 +152,14 @@ public class Attendance {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     public LocalDateTime getCreateTime() {

@@ -26,9 +26,32 @@ public class User {
     @Column(name = "create_time")
     private LocalDateTime createTime;  // ✅ 使用 LocalDateTime
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Student student;
+
     @PrePersist
     protected void onCreate() {
         createTime = LocalDateTime.now();
+    }
+
+    public User(Long id, String username, String password, String realName, String role, LocalDateTime createTime) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.realName = realName;
+        this.role = role;
+        this.createTime = createTime;
+    }
+
+    public User() {
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 
     // Getters and Setters

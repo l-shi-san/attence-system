@@ -1,7 +1,6 @@
 package com.example.attendance.repository;
 
 import com.example.attendance.entity.Attendance;
-import com.example.attendance.entity.AttendanceStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,46 +13,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface AttendanceRepository extends JpaRepository<Attendance, Long>, JpaSpecificationExecutor<Attendance> {
+public interface AttendanceRepository extends JpaRepository<Attendance, Integer>, JpaSpecificationExecutor<Attendance> {
 
-    // 原有的方法...
-    List<Attendance> findByStudentId(String studentId);
-    List<Attendance> findByCourseId(String courseId);
-    List<Attendance> findByStatus(AttendanceStatus status);
-    List<Attendance> findByStudentIdAndCourseId(String studentId, String courseId);
-    List<Attendance> findByCheckInTimeBetween(LocalDateTime start, LocalDateTime end);
-    List<Attendance> findByCourseIdAndStatus(String courseId, AttendanceStatus status);
+    List<Attendance> findByStudentId(Integer studentId);
 
-    @Query("SELECT a.status, COUNT(a) FROM Attendance a WHERE a.courseId = :courseId GROUP BY a.status")
-    List<Object[]> countByCourseIdGroupByStatus(@Param("courseId") String courseId);
+    Page<Attendance> findByStudentId(Integer studentId, Pageable pageable);
 
-    @Query("SELECT a FROM Attendance a WHERE a.studentId = :studentId AND a.courseId = :courseId ORDER BY a.checkInTime DESC")
-    List<Attendance> findLatestByStudentIdAndCourseId(@Param("studentId") String studentId, @Param("courseId") String courseId);
+    List<Attendance> findByCourseId(Integer courseId);
 
-    // ========== 新增分页查询方法 ==========
+    boolean existsByStudentIdAndCourseIdAndCheckInTimeBetween(
+            Integer studentId, Integer courseId, LocalDateTime start, LocalDateTime end);
 
-    /**
-     * 分页查询所有考勤记录
-     */
-    Page<Attendance> findAll(Pageable pageable);
+    List<Attendance> findByStudentIdAndCheckInTimeBetween(
+            Integer studentId, LocalDateTime start, LocalDateTime end);
 
-    /**
-     * 根据学生ID分页查询
-     */
-    Page<Attendance> findByStudentId(String studentId, Pageable pageable);
+    Integer countByStudentIdAndStatus(Integer studentId, String status);
 
-    /**
-     * 根据课程ID分页查询
-     */
-    Page<Attendance> findByCourseId(String courseId, Pageable pageable);
-
-    /**
-     * 根据状态分页查询
-     */
-    Page<Attendance> findByStatus(AttendanceStatus status, Pageable pageable);
-
-    /**
-     * 根据时间范围分页查询
-     */
-    Page<Attendance> findByCheckInTimeBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
+    Page<Attendance> findByStudentNoContainingOrStudentNameContainingOrCourseNameContaining(
+            String studentNo, String studentName, String courseName, Pageable pageable);
 }

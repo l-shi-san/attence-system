@@ -4,6 +4,7 @@ import com.example.attendance.dao.UserDao;
 import com.example.attendance.entity.User;
 import com.example.attendance.repository.UserRepository;
 import com.example.attendance.service.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,18 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional
+    public User save(User user) {
+        // 设置创建时间（新增时）
+        if (user.getId() == null) {
+            user.setCreateTime(LocalDateTime.now());
+        }
+
+        // 保存并返回
+        return userRepository.save(user);
+    }
 
     // 用户注册
     @Override

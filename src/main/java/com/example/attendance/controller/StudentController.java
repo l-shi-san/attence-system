@@ -23,11 +23,11 @@ public class StudentController {
 
     @PostMapping("/create")
     public Result<Student> create(@RequestBody Student student){
-        return  Result.success(studentService.createStudent(student));
+        return Result.success(studentService.createStudent(student));
     }
 
     @GetMapping("/{id}")
-    public Result<Student> getById(@PathVariable Long id){
+    public Result<Student> getById(@PathVariable Integer id){
         return Result.success(studentService.findStudentById(id));
     }
 
@@ -35,7 +35,7 @@ public class StudentController {
     public String studentList(Model model) {
         List<Student> students = studentService.findAll();
         model.addAttribute("students", students);
-        return "students";
+        return "student-list";
     }
 
     @GetMapping("/list")
@@ -47,15 +47,12 @@ public class StudentController {
                        @RequestParam(defaultValue = "desc") String sortDir,
                        Model model) {
 
-        // 创建排序对象
         Sort.Direction direction = sortDir.equalsIgnoreCase("asc") ?
                 Sort.Direction.ASC : Sort.Direction.DESC;
         Sort sort = Sort.by(direction, sortField);
 
-        // 创建分页对象
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        // 查询数据
         Page<Student> studentPage;
         if (keyword != null && !keyword.isEmpty()) {
             if ("studentNo".equals(searchType)) {
@@ -67,11 +64,9 @@ public class StudentController {
             studentPage = studentService.findAll(pageable);
         }
 
-        // 计算上一页和下一页
         int prevPage = page > 1 ? page - 1 : 1;
         int nextPage = page < studentPage.getTotalPages() ? page + 1 : studentPage.getTotalPages();
 
-        // 添加到模型
         model.addAttribute("students", studentPage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("prevPage", prevPage);
@@ -88,41 +83,57 @@ public class StudentController {
         return "student-list";
     }
 
-    // 新增学生页面
     @GetMapping("/add")
     public String addPage(Model model) {
         model.addAttribute("student", new Student());
         model.addAttribute("title", "新增学生");
+        model.addAttribute("isNew", true);
         return "student-form";
     }
 
-    // 编辑学生页面
     @GetMapping("/edit/{id}")
-    public String editPage(@PathVariable Long id, Model model) {
+    public String editPage(@PathVariable Integer id, Model model) {
         Student student = studentService.findById(id);
+        if (student == null) {
+            return "redirect:/student/list";
+        }
         model.addAttribute("student", student);
         model.addAttribute("title", "编辑学生");
+        model.addAttribute("isNew", false);
         return "student-form";
     }
 
-    // 保存学生
     @PostMapping("/save")
-    public String save(@ModelAttribute Student student, Model model) {
-        if (student.getId() == null) {
+    public String save(@ModelAttribute Student student,
+                       @RequestParam(required = false) String initialPassword,
+                       Model model) {
+        boolean isNew = student.getId() == 0;
+
+        if (isNew) {
             if (studentService.existsByStudentNo(student.getStudentNo())) {
                 model.addAttribute("errorMsg", "学号已存在！");
                 model.addAttribute("student", student);
                 model.addAttribute("title", "新增学生");
+                model.addAttribute("isNew", true);
                 return "student-form";
             }
+            try {
+                studentService.saveWithUser(student, initialPassword);
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("errorMsg", e.getMessage());
+                model.addAttribute("student", student);
+                model.addAttribute("title", "新增学生");
+                model.addAttribute("isNew", true);
+                return "student-form";
+            }
+        } else {
+            studentService.save(student);
         }
-        studentService.save(student);
         return "redirect:/student/list";
     }
 
-    // 删除学生
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable Long id) {
+    public String delete(@PathVariable Integer id) {
         studentService.deleteById(id);
         return "redirect:/student/list";
     }

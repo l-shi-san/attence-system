@@ -12,6 +12,10 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
+    private User user;
+
     @Column(name = "student_no", nullable = false, unique = true, length = 20)
     private String studentNo;  // 学号
 
@@ -38,6 +42,30 @@ public class Student {
 
     @Column(name = "update_time")
     private LocalDateTime updateTime;
+
+
+    public Student(int id, String studentNo, String name, LocalDate birthDate, String gender, String className, String phone, Integer status, LocalDateTime createTime, LocalDateTime updateTime) {
+        this.id = id;
+        this.studentNo = studentNo;
+        this.name = name;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.className = className;
+        this.phone = phone;
+        this.status = status;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
+    public Student() {}
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Integer getId() {
         return id;

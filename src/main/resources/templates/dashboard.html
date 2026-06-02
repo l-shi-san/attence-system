@@ -1,22 +1,94 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${title}">首页</title>
+    <title th:text="${title}">班级考勤管理系统</title>
     <style>
-        .container { width: 500px; margin: 100px auto; text-align: center; }
-        h1 { color: #333; }
-        .nav { margin-top: 30px; }
-        a { display: inline-block; margin: 0 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 3px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 50px 20px; }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { color: #333; font-size: 32px; margin-bottom: 15px; }
+        .subtitle {
+            color: #666; font-size: 16px; margin-bottom: 10px;
+            padding-bottom: 20px; border-bottom: 1px solid #eee;
+        }
+        .user-info { color: #888; font-size: 14px; margin-bottom: 20px; }
+        .nav {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .nav a {
+            display: block;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+        .nav a:hover {
+            background-color: #007bff;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,123,255,0.3);
+            border-color: #007bff;
+        }
+        .logout {
+            margin-top: 25px;
+        }
+        .logout a {
+            color: #dc3545;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .footer { margin-top: 30px; color: #999; font-size: 12px; }
+        @media (max-width: 500px) {
+            .nav { grid-template-columns: 1fr; }
+            .card { padding: 30px 20px; }
+            h1 { font-size: 24px; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1 th:text="${title}">班级考勤管理系统</h1>
-    <p>欢迎使用本系统！</p>
-    <div class="nav">
-        <a href="/student/list">学生管理</a>
-        <a href="/attendance/list">考勤管理</a>
+    <div class="card">
+        <h1>📋 <span th:text="${title}">班级考勤管理系统</span></h1>
+        <div class="subtitle">欢迎使用本系统，请选择功能</div>
+        <div class="user-info">
+            当前用户：<strong sec:authentication="name">用户</strong>
+            （<span sec:authentication="principal.authorities">角色</span>）
+        </div>
+
+        <div class="nav">
+            <a href="/student/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">👨‍🎓 学生管理</a>
+            <a href="/course/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📚 课程管理</a>
+            <a href="/attendance/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📊 考勤管理</a>
+            <a href="/attendance/checkin" sec:authorize="hasRole('STUDENT')">✅ 考勤打卡</a>
+            <a href="/attendance/my-list" sec:authorize="hasRole('STUDENT')">📝 我的考勤</a>
+        </div>
+
+        <div class="logout">
+            <a href="/logout">退出登录</a>
+        </div>
+
+        <div class="footer">
+            <p>班级考勤管理系统</p>
+        </div>
     </div>
 </div>
 </body>
