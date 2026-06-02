@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户管理 - 班级考勤管理系统</title>
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+  <style>
+    .container { max-width: 1000px; margin-top: 20px; margin-bottom: 20px; }
+    .role-badge { font-size: 13px; padding: 5px 12px; }
+    @media (max-width: 576px) {
+      .card-header { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">👥 用户管理</h3>
+      <a href="/dashboard" class="btn btn-outline-light btn-sm">返回首页</a>
+    </div>
+    <div class="card-body">
+      <div th:if="${successMsg}" class="alert alert-success alert-dismissible fade show" th:text="${successMsg}">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div class="alert alert-info">
+        共 <strong th:text="${#lists.size(users)}">0</strong> 个用户
+      </div>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+          <tr>
+            <th>ID</th><th>用户名</th><th>真实姓名</th><th>角色</th><th>创建时间</th><th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="user : ${users}">
+            <td th:text="${user.id}">1</td>
+            <td th:text="${user.username}">admin</td>
+            <td th:text="${user.realName ?: '-'}">管理员</td>
+            <td>
+              <span th:if="${user.role == 'ADMIN'}" class="badge bg-danger role-badge">管理员</span>
+              <span th:if="${user.role == 'TEACHER'}" class="badge bg-primary role-badge">教师</span>
+              <span th:if="${user.role == 'STUDENT'}" class="badge bg-success role-badge">学生</span>
+            </td>
+            <td th:text="${#temporals.format(user.createTime, 'yyyy-MM-dd HH:mm')}">2026-01-01 12:00</td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown">🔄 改角色</button>
+                <ul class="dropdown-menu">
+                  <li>
+                    <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
+                      <input type="hidden" name="role" value="ADMIN"/>
+                      <button type="submit" class="dropdown-item">管理员</button>
+                    </form>
+                  </li>
+                  <li>
+                    <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
+                      <input type="hidden" name="role" value="TEACHER"/>
+                      <button type="submit" class="dropdown-item">教师</button>
+                    </form>
+                  </li>
+                  <li>
+                    <form th:action="@{/admin/users/{id}/role(id=${user.id})}" method="post">
+                      <input type="hidden" name="role" value="STUDENT"/>
+                      <button type="submit" class="dropdown-item">学生</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(users)}">
+            <td colspan="6" class="text-center text-muted py-4">暂无用户数据</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:src="@{/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

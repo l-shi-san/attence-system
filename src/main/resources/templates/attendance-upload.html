@@ -2,8 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excel 考勤导入</title>
     <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
+    <style>
+        @media (max-width: 576px) { .card-header { flex-direction: column; gap: 8px; } }
+    </style>
 </head>
 <body>
 <div class="container mt-4 mb-4">
@@ -21,7 +25,7 @@
                     <li>支持 <code>.xlsx</code> / <code>.xls</code> 格式</li>
                     <li>单个文件最大 <strong>10 MB</strong></li>
                     <li>第一行为标题行（自动跳过）</li>
-                    <li>Excel 列顺序：<strong>A-学号, B-姓名, C-课程名称, D-打卡日期(yyyy-MM-dd), E-打卡时间(HH:mm:ss), F-状态(NORMAL/LATE/EARLY/ABSENT), G-备注(可选)</strong></li>
+                    <li>Excel 列顺序：<strong>A-学号, B-姓名, C-课程名称, D-打卡日期(yyyy-MM-dd), E-打卡时间(HH:mm:ss), F-状态(NORMAL/LATE/ABSENT), G-备注(可选)</strong></li>
                 </ul>
             </div>
 

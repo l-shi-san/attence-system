@@ -3,6 +3,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${title}">班级考勤管理系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -71,15 +72,17 @@
         <div class="subtitle">欢迎使用本系统，请选择功能</div>
         <div class="user-info">
             当前用户：<strong sec:authentication="name">用户</strong>
-            （<span sec:authentication="principal.authorities">角色</span>）
+            （<span th:text="${roleName}">角色</span>）
         </div>
 
         <div class="nav">
             <a href="/student/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">👨‍🎓 学生管理</a>
-            <a href="/course/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📚 课程管理</a>
+            <a href="/course/list" sec:authorize="hasRole('ADMIN')">📚 课程管理</a>
+            <a href="/admin/users" sec:authorize="hasRole('ADMIN')">👥 用户管理</a>
+            <a href="/admin/semester" sec:authorize="hasRole('ADMIN')">📅 学期配置</a>
             <a href="/attendance/list" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📊 考勤管理</a>
             <a href="/attendance/upload" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📤 导入考勤</a>
-            <a href="/attendance/statistics?mode=range" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📈 考勤统计</a>
+            <a href="/attendance/statistics" sec:authorize="hasAnyRole('ADMIN','TEACHER')">📈 考勤统计</a>
             <a href="/attendance/checkin" sec:authorize="hasRole('STUDENT')">✅ 考勤打卡</a>
             <a href="/attendance/my-list" sec:authorize="hasRole('STUDENT')">📝 我的考勤</a>
         </div>

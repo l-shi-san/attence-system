@@ -32,8 +32,9 @@ import java.util.List;
  *   C列: 课程名称  (courseName)
  *   D列: 打卡日期  (checkInDate, 格式 yyyy-MM-dd)
  *   E列: 打卡时间  (checkInTime, 格式 HH:mm:ss)
- *   F列: 状态     (status: NORMAL/LATE/EARLY/ABSENT)
+ *   F列: 状态     (status: NORMAL/LATE/ABSENT)
  *   G列: 备注     (remark, 可选)
+ *   H列: IP地址   (ip, 可选)
  */
 @Service
 public class AttendanceImportServiceImpl implements AttendanceImportService {
@@ -175,14 +176,18 @@ public class AttendanceImportServiceImpl implements AttendanceImportService {
         }
         status = status.trim().toUpperCase();
         if (!"NORMAL".equals(status) && !"LATE".equals(status)
-                && !"EARLY".equals(status) && !"ABSENT".equals(status)) {
-            throw new IllegalArgumentException("考勤状态无效（应为 NORMAL/LATE/EARLY/ABSENT）: " + status);
+                && !"ABSENT".equals(status)) {
+            throw new IllegalArgumentException("考勤状态无效（应为 NORMAL/LATE/ABSENT）: " + status);
         }
         attendance.setStatus(status);
 
         // G列: 备注（可选）
         String remark = getCellStringValue(row.getCell(6));
         attendance.setRemark(remark != null ? remark.trim() : "");
+
+        // H列: IP地址（可选）
+        String ip = getCellStringValue(row.getCell(7));
+        attendance.setIp(ip != null ? ip.trim() : "");
 
         return attendance;
     }

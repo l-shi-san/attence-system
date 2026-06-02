@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.List;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 /**
  * 考勤文件上传与统计控制器
  *
@@ -113,6 +115,30 @@ public class AttendanceUploadController {
     }
 
     // ========================================================================
+    // 考勤数据导出
+    // ========================================================================
+
+    @GetMapping("/export")
+    public void exportAttendance(@RequestParam(required = false) String startDate,
+                                 @RequestParam(required = false) String endDate,
+                                 HttpServletResponse response) throws Exception {
+        LocalDate start = (startDate != null && !startDate.isBlank())
+                ? LocalDate.parse(startDate) : LocalDate.now().minusMonths(1);
+        LocalDate end = (endDate != null && !endDate.isBlank())
+                ? LocalDate.parse(endDate) : LocalDate.now();
+
+        String fileName = "考勤数据_" + start + "_" + end + ".xlsx";
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" +
+                new String(fileName.getBytes("UTF-8"), "ISO-8859-1") + "\"");
+
+        byte[] excelData = attendanceService.exportAttendanceToExcel(start, end);
+        response.getOutputStream().write(excelData);
+        response.getOutputStream().flush();
+    }
+
+    // ========================================================================
     // 考勤统计
     // ========================================================================
 
@@ -122,7 +148,7 @@ public class AttendanceUploadController {
     @GetMapping("/statistics")
     public String statisticsPage(@RequestParam(required = false) String startDate,
                                  @RequestParam(required = false) String endDate,
-                                 @RequestParam(required = false, defaultValue = "range") String mode,
+                                 @RequestParam(required = false, defaultValue = "course") String mode,
                                  @RequestParam(required = false, defaultValue = "12") int weeks,
                                  @RequestParam(required = false, defaultValue = "6") int months,
                                  Model model) {
@@ -140,6 +166,18 @@ public class AttendanceUploadController {
             model.addAttribute("statsList", monthlyStats);
             model.addAttribute("statMode", "monthly");
             model.addAttribute("months", months);
+
+        } else if ("course".equals(mode)) {
+            // ===== 按课程统计 =====
+            LocalDate start = (startDate != null && !startDate.isBlank())
+                    ? LocalDate.parse(startDate) : LocalDate.now().minusMonths(1);
+            LocalDate end = (endDate != null && !endDate.isBlank())
+                    ? LocalDate.parse(endDate) : LocalDate.now();
+            List<AttendanceStatisticsDTO> courseStats = attendanceService.getStatisticsByCourse(start, end);
+            model.addAttribute("statsList", courseStats);
+            model.addAttribute("statMode", "course");
+            model.addAttribute("startDate", start.toString());
+            model.addAttribute("endDate", end.toString());
 
         } else {
             // ===== 按日期范围统计 =====

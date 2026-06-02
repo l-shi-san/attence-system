@@ -5,6 +5,9 @@ import com.example.attendance.entity.User;
 import com.example.attendance.service.StudentService;
 import com.example.attendance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -108,6 +111,17 @@ public class PageController {
     @GetMapping("/dashboard")
     public String dashboardPage(Model model) {
         model.addAttribute("title", "班级考勤管理系统");
+
+        String roleName = "访客";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            for (GrantedAuthority a : auth.getAuthorities()) {
+                if ("ROLE_ADMIN".equals(a.getAuthority())) roleName = "管理员";
+                else if ("ROLE_TEACHER".equals(a.getAuthority())) roleName = "教师";
+                else if ("ROLE_STUDENT".equals(a.getAuthority())) roleName = "学生";
+            }
+        }
+        model.addAttribute("roleName", roleName);
         return "dashboard";
     }
 }

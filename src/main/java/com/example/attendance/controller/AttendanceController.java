@@ -1,5 +1,6 @@
 package com.example.attendance.controller;
 
+import com.example.attendance.dto.CheckInResult;
 import com.example.attendance.entity.Attendance;
 import com.example.attendance.entity.Course;
 import com.example.attendance.entity.Student;
@@ -22,6 +23,12 @@ import java.util.List;
 @Controller
 @RequestMapping("/attendance")
 public class AttendanceController {
+
+    static String normalizeIp(String ip) {
+        if (ip == null) return "";
+        if ("0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip)) return "127.0.0.1";
+        return ip;
+    }
 
     @Autowired
     private AttendanceService attendanceService;
@@ -63,11 +70,11 @@ public class AttendanceController {
             return "redirect:/login";
         }
 
-        String ip = request.getRemoteAddr();
-        Attendance attendance = attendanceService.checkIn(student.getId(), courseId, remark, ip);
+        String ip = normalizeIp(request.getRemoteAddr());
+        CheckInResult result = attendanceService.checkIn(student.getId(), courseId, remark, ip);
 
-        if (attendance == null) {
-            model.addAttribute("errorMsg", "今天已经打卡过了，或课程不存在！");
+        if (!result.isSuccess()) {
+            model.addAttribute("errorMsg", result.getErrorMsg());
             List<Course> courses = courseService.findActiveCourses();
             model.addAttribute("courses", courses);
             model.addAttribute("student", student);

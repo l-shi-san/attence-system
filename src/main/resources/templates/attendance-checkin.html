@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>考勤打卡</title>
   <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
   <style>
@@ -10,38 +11,32 @@
     .time-display { font-size: 48px; font-weight: bold; text-align: center; margin: 20px 0; }
     .date-display { text-align: center; font-size: 18px; color: #666; margin-bottom: 20px; }
     .student-info { background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+    @media (max-width: 576px) {
+      .time-display { font-size: 32px; }
+      .container { margin-top: 20px; }
+    }
   </style>
 </head>
 <body>
 <div class="container">
   <div class="card">
     <div class="card-header bg-primary text-white">
-      <h3 class="mb-0">📝 考勤打卡</h3>
+      <h3 class="mb-0">考勤打卡</h3>
     </div>
     <div class="card-body">
-      <!-- 错误提示 -->
       <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
 
-      <!-- 时间显示 -->
       <div class="time-display" id="currentTime"></div>
       <div class="date-display" id="currentDate"></div>
 
-      <!-- 学生信息 -->
       <div class="student-info" th:if="${student != null}">
         <div class="row">
-          <div class="col-md-6">
-            <strong>学号：</strong> <span th:text="${student.studentNo}"></span>
-          </div>
-          <div class="col-md-6">
-            <strong>姓名：</strong> <span th:text="${student.name}"></span>
-          </div>
-          <div class="col-md-6">
-            <strong>班级：</strong> <span th:text="${student.className}"></span>
-          </div>
+          <div class="col-md-6"><strong>学号：</strong><span th:text="${student.studentNo}"></span></div>
+          <div class="col-md-6"><strong>姓名：</strong><span th:text="${student.name}"></span></div>
+          <div class="col-md-6"><strong>班级：</strong><span th:text="${student.className}"></span></div>
         </div>
       </div>
 
-      <!-- 打卡表单 -->
       <form method="post">
         <div class="mb-3">
           <label class="form-label">选择课程</label>
@@ -61,12 +56,13 @@
         </div>
 
         <div class="alert alert-info">
-          <small>⚠️ 温馨提示：上课时间开始后打卡将被记为迟到，请按时打卡！</small>
+          <small>打卡有效时段：上课前 <strong>20 分钟</strong> 至上课后 <strong>5 分钟</strong>。
+          上课前打卡为正常，上课后打卡为迟到，超出时段无法打卡。</small>
         </div>
 
-        <div class="d-flex justify-content-between">
-          <button type="submit" class="btn btn-primary btn-lg">✅ 确认打卡</button>
-          <a href="/dashboard" class="btn btn-secondary">返回首页</a>
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+          <button type="submit" class="btn btn-primary flex-fill">确认打卡</button>
+          <a href="/dashboard" class="btn btn-secondary flex-fill">返回首页</a>
         </div>
       </form>
     </div>
@@ -74,16 +70,12 @@
 </div>
 
 <script>
-  // 实时更新时间
   function updateTime() {
     var now = new Date();
-    var timeStr = now.toLocaleTimeString('zh-CN', {hour12: false});
-    var dateStr = now.toLocaleDateString('zh-CN', {year: 'numeric', month: 'long', day: 'numeric'});
-    document.getElementById('currentTime').innerHTML = timeStr;
-    document.getElementById('currentDate').innerHTML = dateStr;
+    document.getElementById('currentTime').innerHTML = now.toLocaleTimeString('zh-CN', {hour12: false});
+    document.getElementById('currentDate').innerHTML = now.toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
   }
-  updateTime();
-  setInterval(updateTime, 1000);
+  updateTime(); setInterval(updateTime, 1000);
 </script>
 </body>
 </html>

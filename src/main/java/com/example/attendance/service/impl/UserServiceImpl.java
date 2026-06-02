@@ -1,7 +1,9 @@
 package com.example.attendance.service.impl;
 
 import com.example.attendance.dao.UserDao;
+import com.example.attendance.entity.Student;
 import com.example.attendance.entity.User;
+import com.example.attendance.repository.StudentRepository;
 import com.example.attendance.repository.UserRepository;
 import com.example.attendance.service.UserService;
 import jakarta.transaction.Transactional;
@@ -21,6 +23,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Override
     @Transactional
@@ -76,5 +81,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public void updateRole(Long userId, String newRole) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) return;
+        String oldRole = user.getRole();
+        user.setRole(newRole);
+        userRepository.save(user);
+
+        if ("STUDENT".equals(oldRole) && !"STUDENT".equals(newRole)) {
+            Student student = studentRepository.findByStudentNo(user.getUsername());
+            if (student != null) {
+                user.setStudent(null);
+                userRepository.save(user);
+                student.setUser(null);
+                studentRepository.delete(student);
+            }
+        }
     }
 }

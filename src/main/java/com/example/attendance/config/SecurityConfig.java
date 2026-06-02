@@ -36,18 +36,22 @@ public class SecurityConfig {
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new AuthenticationSuccessHandler() {
+            private final HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+
             @Override
             public void onAuthenticationSuccess(HttpServletRequest request,
                                                 HttpServletResponse response,
                                                 Authentication authentication) throws IOException, ServletException {
-                HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
                 SavedRequest savedRequest = requestCache.getRequest(request, response);
 
                 if (savedRequest != null) {
-                    response.sendRedirect(savedRequest.getRedirectUrl());
-                } else {
-                    response.sendRedirect("/dashboard");
+                    String redirectUrl = savedRequest.getRedirectUrl();
+                    if (redirectUrl != null && !redirectUrl.contains("/login") && !redirectUrl.contains("/register")) {
+                        response.sendRedirect(redirectUrl);
+                        return;
+                    }
                 }
+                response.sendRedirect("/dashboard");
             }
         };
     }
@@ -65,10 +69,11 @@ public class SecurityConfig {
                         .requestMatchers("/student/students", "/student/{id}", "/student/create")
                             .hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers("/attendance/checkin", "/attendance/my-list").hasRole("STUDENT")
-                        .requestMatchers("/attendance/list", "/attendance/student/**", "/attendance/upload", "/attendance/statistics").hasAnyRole("ADMIN", "TEACHER")
-                        .requestMatchers("/course/**").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers("/attendance/list", "/attendance/student/**", "/attendance/upload", "/attendance/export", "/attendance/statistics").hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers("/course/**").hasRole("ADMIN")
                         .requestMatchers("/dashboard").authenticated()
                         .requestMatchers("/api/auth/me").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/teacher/**").hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers("/api/student/**").hasAnyRole("ADMIN", "TEACHER", "STUDENT")

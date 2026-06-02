@@ -2,10 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>学生管理 - 班级考勤管理系统</title>
   <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}"/>
   <style>
     .container { max-width: 1200px; margin-top: 20px; margin-bottom: 20px; }
+    @media (max-width: 576px) { .card-header { flex-direction: column; gap: 8px; } }
     .search-form { margin-bottom: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; }
     .pagination { margin-top: 20px; justify-content: center; }
     .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }

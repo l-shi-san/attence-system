@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
@@ -44,7 +44,7 @@ public class Student {
     private LocalDateTime updateTime;
 
 
-    public Student(int id, String studentNo, String name, LocalDate birthDate, String gender, String className, String phone, Integer status, LocalDateTime createTime, LocalDateTime updateTime) {
+    public Student(Integer id, String studentNo, String name, LocalDate birthDate, String gender, String className, String phone, Integer status, LocalDateTime createTime, LocalDateTime updateTime) {
         this.id = id;
         this.studentNo = studentNo;
         this.name = name;
@@ -71,7 +71,7 @@ public class Student {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

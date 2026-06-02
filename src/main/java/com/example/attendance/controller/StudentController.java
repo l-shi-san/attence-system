@@ -107,7 +107,7 @@ public class StudentController {
     public String save(@ModelAttribute Student student,
                        @RequestParam(required = false) String initialPassword,
                        Model model) {
-        boolean isNew = student.getId() == 0;
+        boolean isNew = student.getId() == null || student.getId() == 0;
 
         if (isNew) {
             if (studentService.existsByStudentNo(student.getStudentNo())) {

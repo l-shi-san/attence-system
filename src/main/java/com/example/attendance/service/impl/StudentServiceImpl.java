@@ -49,7 +49,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student save(Student student) {
-        if (student.getId() == 0) {
+        if (student.getId() == null || student.getId() == 0) {
             student.setCreateTime(LocalDateTime.now());
         } else {
             student.setUpdateTime(LocalDateTime.now());
@@ -60,7 +60,7 @@ public class StudentServiceImpl implements StudentService {
     @Override
     @Transactional
     public Student saveWithUser(Student student, String initialPassword) {
-        if (student.getId() == 0) {
+        if (student.getId() == null || student.getId() == 0) {
             if (userRepository.existsByUsername(student.getStudentNo())) {
                 throw new IllegalArgumentException("学号已存在，无法创建账号");
             }
